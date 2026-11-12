@@ -1,5 +1,0 @@
-const THEME_DEFAULTS={title:"🤍 AMO A LORENA 🤍",bg:"#07030f",panel:"#1a0b30",border:"#6e32ad",button:"#110723",buttonBorder:"#6e32ad",particle:"#b75bff",orb:"#b75bff",titleColor:"#ffffff"};
-const THEME_KEYS={bg:"--theme-bg",panel:"--theme-panel",border:"--theme-border",button:"--theme-button",buttonBorder:"--theme-button-border",particle:"--theme-particle",orb:"--theme-orb",titleColor:"--theme-title"};
-function applySiteTheme(data){const theme={...THEME_DEFAULTS,...data};for(const [k,v] of Object.entries(THEME_KEYS)){if(/^#[0-9a-fA-F]{6}$/.test(theme[k]))document.documentElement.style.setProperty(v,theme[k]);}const title=document.getElementById("siteTitle");if(title)title.textContent=String(theme.title||THEME_DEFAULTS.title).slice(0,100);return theme;}
-async function loadSiteTheme(){try{const r=await fetch("/api/theme",{cache:"no-store"});if(!r.ok)throw Error("API indisponível");const j=await r.json();if(j.theme)applySiteTheme(j.theme);}catch(e){console.info("Tema padrão ativo:",e.message);}}
-applySiteTheme(THEME_DEFAULTS);loadSiteTheme();

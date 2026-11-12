@@ -1,1 +1,68 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin • QUIEZIN15</title><link rel="stylesheet" href="../css/admin.css"></head><body><main class="panel"><header><div><small>QUIEZIN15 / SISTEMA</small><h1>✦ Painel de aparência</h1><p>Personalize o site e publique as alterações.</p></div><a href="/">↗ Ver site</a></header><section class="auth"><h2>🔒 Acesso administrativo</h2><div class="auth-fields"><label>E-mail<input id="email" type="email" autocomplete="username" placeholder="seu@email.com"></label><label>Senha<input id="password" type="password" autocomplete="current-password" placeholder="Sua senha"></label><button id="login">Entrar</button><button id="logout" hidden>Sair</button></div><p id="authStatus">Entre com a conta autorizada do Supabase.</p></section><section class="editor" id="editor" hidden><div class="section-title"><h2>🎨 Editor de cores</h2><p>Clique no quadrado para abrir o seletor de cor e arrastar para escolher qualquer tom.</p></div><label class="title-field">Título do site<input id="title" maxlength="100" placeholder="Título principal"></label><div id="colors" class="color-grid"></div><h2>Prévia ao vivo</h2><div class="preview"><h2 id="previewTitle"></h2><div class="preview-image">PRÉVIA DAS BORDAS DA IMAGEM</div><button type="button" id="previewButton">🛒 LOJA</button><div class="orb"></div><div class="particle"></div></div><div class="actions"><button id="save">Salvar e publicar</button><button id="reset" class="secondary">Restaurar cores originais</button></div><p id="saveStatus" role="status"></p></section><footer>As alterações salvas aparecem para todos os visitantes. O painel também acompanha as cores selecionadas.</footer></main><script src="../js/admin.js"></script></body></html>
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090b16">
+  <title>Painel administrativo • Digital</title>
+  <link rel="stylesheet" href="../css/admin.css">
+  <script defer src="../js/admin.js"></script>
+</head>
+<body>
+  <main class="panel">
+    <header class="panel-header">
+      <div><span class="overline">ÁREA RESTRITA / GESTÃO</span><h1>Painel <em>Digital.</em></h1><p>Gerencie a página, os conteúdos e a ordem dos botões.</p></div>
+      <a class="view-site" href="/" target="_blank" rel="noopener noreferrer">Ver página pública ↗</a>
+    </header>
+    <section class="panel-section auth-section" aria-labelledby="authTitle">
+      <div class="section-heading"><span class="section-icon">01</span><div><h2 id="authTitle">Acesso administrativo</h2><p>Somente a conta autorizada pode publicar alterações.</p></div></div>
+      <div class="auth-fields">
+        <label>E-mail<input id="email" type="email" autocomplete="username" placeholder="admin@exemplo.com" inputmode="email"></label>
+        <label>Senha<input id="password" type="password" autocomplete="current-password" placeholder="Sua senha"></label>
+        <button id="login" type="button" class="primary">Entrar no painel</button>
+        <button id="logout" type="button" class="secondary" hidden>Sair da conta</button>
+      </div>
+      <p id="authStatus" class="status" role="status">Faça login para editar e publicar.</p>
+    </section>
+    <div id="editor" hidden>
+      <section class="panel-section" aria-labelledby="generalTitle">
+        <div class="section-heading"><span class="section-icon">02</span><div><h2 id="generalTitle">Textos da página</h2><p>Personalize o título, a frase de destaque e a apresentação.</p></div></div>
+        <div class="fields-grid">
+          <label class="full">Título principal<input id="title" type="text" maxlength="110" placeholder="Título da página"></label>
+          <label>Frase acima do título<input id="subtitle" type="text" maxlength="90" placeholder="APRENDA • APLIQUE • EVOLUA"></label>
+          <label class="full">Descrição<textarea id="description" maxlength="480" rows="3" placeholder="Descrição do site"></textarea></label>
+        </div>
+      </section>
+      <section class="panel-section" aria-labelledby="buttonsTitle">
+        <div class="section-heading split-heading">
+          <div class="heading-group"><span class="section-icon">03</span><div><h2 id="buttonsTitle">Botões e conteúdos</h2><p>Adicione, edite, reordene ou remova. Deixe a URL vazia para exibir “Link em configuração”.</p></div></div>
+          <button id="addButton" type="button" class="primary">+ Adicionar botão</button>
+        </div>
+        <div id="buttons" class="button-editors"></div>
+        <p class="hint">Use as setas ↑ ↓ para alterar a posição. Os botões do topo aparecem primeiro na página pública. Máximo: 24.</p>
+      </section>
+      <section class="panel-section" aria-labelledby="colorsTitle">
+        <div class="section-heading split-heading">
+          <div class="heading-group"><span class="section-icon">04</span><div><h2 id="colorsTitle">Aparência e cores</h2><p>Altere as cores sem mexer nos conteúdos.</p></div></div>
+          <button id="resetColors" type="button" class="secondary">Restaurar cores</button>
+        </div>
+        <div id="colors" class="color-grid"></div>
+      </section>
+      <section class="panel-section" aria-labelledby="previewHeading">
+        <div class="section-heading"><span class="section-icon">05</span><div><h2 id="previewHeading">Prévia dos conteúdos</h2><p>Veja a ordem antes de publicar.</p></div></div>
+        <div class="preview">
+          <span class="preview-kicker">PRÉVIA DA PÁGINA</span>
+          <h3 id="previewTitle"></h3><p id="previewDescription"></p>
+          <div id="previewButtons" class="preview-buttons"></div>
+        </div>
+      </section>
+      <div class="savebar">
+        <p>As alterações só aparecem para os visitantes depois de salvar.</p>
+        <button id="save" type="button" class="primary save-button">Salvar e publicar ↗</button>
+      </div>
+      <p id="saveStatus" class="status save-status" role="status"></p>
+    </div>
+    <footer>Configurações armazenadas com segurança no Supabase. Não compartilhe sua senha de administrador.</footer>
+  </main>
+</body>
+</html>
