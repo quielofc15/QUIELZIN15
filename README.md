@@ -1,13 +1,18 @@
-# Conteúdos e Cursos Digitais
+# Digital — Conteúdos e Cursos
 
-Página única de conteúdo digital, com cards gerenciáveis por painel administrativo.
+Página única de conteúdo digital com primeiro destaque **Como fazer a sua primeira venda no digital**. Redes sociais e nomes pessoais não aparecem na página.
 
-- Site público: /
-- Painel: /admin/
-- Primeiro conteúdo: Como fazer a sua primeira venda no digital.
-- No painel: adicionar, editar, ocultar, excluir e ordenar botões; editar URLs; configurar títulos e cores.
-- Hospedagem: Vercel; persistência: Supabase (tabela site_theme).
+## Produção: Cloudflare Workers
 
-Consulte SETUP-PAINEL.md para configurar as variáveis e publicar.
+- Worker: digital
+- Endereço público: https://digital.quielofc15.workers.dev/
+- Painel administrativo: https://digital.quielofc15.workers.dev/admin/
+- Configuração do deploy: wrangler.jsonc
+- API: worker/index.js
+- Arquivos estáticos: public/
 
-Importante: o primeiro botão vem sem URL por padrão. Configure o link real de venda ou acesso no painel antes de divulgá-lo.
+A versão para Cloudflare inclui APIs de login, sessão, edição de textos/cores e botões configuráveis, com links individuais, ordem e visibilidade.
+
+**Leia CLOUDFLARE-SETUP.md para conectar o GitHub, configurar Cloudflare Secrets (credenciais) e KV ou Supabase para salvar alterações.** Um commit no GitHub só atualiza o Worker automaticamente se o repositório estiver conectado via Cloudflare Workers Builds.
+
+O diretório api/ contém código legado de hospedagem Node/Vercel e não deve ser utilizado para Cloudflare. Nunca grave senhas no GitHub.
