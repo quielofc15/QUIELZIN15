@@ -4,9 +4,9 @@ const defaultTheme = {
   title: "Seu primeiro passo no digital começa aqui.",
   subtitle: "APRENDA • APLIQUE • EVOLUA",
   description: "Conteúdos práticos para transformar ideias em ação, aprender a vender online e desenvolver habilidades no mercado digital.",
-  bg: "#090b16", panel: "#13172b", border: "#343b5f",
-  button: "#1a2040", buttonBorder: "#7772ed", particle: "#aca8ff",
-  orb: "#7566ff", titleColor: "#f7f8ff",
+  bg: "#f8fbf9", panel: "#ffffff", border: "#e2ebe6",
+  button: "#047857", buttonBorder: "#047857", particle: "#10b981",
+  orb: "#059669", titleColor: "#15332c",
   buttons: [{
     id: "primeira-venda",
     title: "Como fazer a sua primeira venda no digital",
@@ -15,6 +15,7 @@ const defaultTheme = {
   }]
 };
 const colors = ["bg", "panel", "border", "button", "buttonBorder", "particle", "orb", "titleColor"];
+const previousPalette = { bg:"#090b16", panel:"#13172b", border:"#343b5f", button:"#1a2040", buttonBorder:"#7772ed", particle:"#aca8ff", orb:"#7566ff", titleColor:"#f7f8ff" };
 const text = (value, max) => typeof value === "string" ? value.trim().slice(0, max) : "";
 const jsonHeaders = { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "x-content-type-options": "nosniff" };
 function json(data, status = 200, extraHeaders = {}) {
@@ -31,6 +32,8 @@ function normalize(raw) {
   const value = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
   const out = {...defaultTheme};
   for (const key of colors) if (typeof value[key] === "string" && /^#[0-9a-f]{6}$/i.test(value[key])) out[key] = value[key];
+  // Conserva as cores personalizadas, mas migra o tema roxo antigo por inteiro ao novo padrão profissional.
+  if (colors.every(key => out[key] === previousPalette[key])) for (const key of colors) out[key] = defaultTheme[key];
   for (const [key, limit] of [["title",110],["subtitle",90],["description",480]]) {
     const v = text(value[key], limit);
     if (v && v !== "🤍 AMO A LORENA 🤍") out[key] = v;

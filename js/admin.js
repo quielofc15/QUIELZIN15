@@ -5,8 +5,8 @@
     title: "Seu primeiro passo no digital começa aqui.",
     subtitle: "APRENDA • APLIQUE • EVOLUA",
     description: "Conteúdos práticos para transformar ideias em ação, aprender a vender online e desenvolver habilidades no mercado digital.",
-    bg: "#090b16", panel: "#13172b", border: "#343b5f",
-    button: "#1a2040", buttonBorder: "#7772ed", particle: "#aca8ff", orb: "#7566ff", titleColor: "#f7f8ff",
+    bg: "#f8fbf9", panel: "#ffffff", border: "#e2ebe6",
+    button: "#047857", buttonBorder: "#047857", particle: "#10b981", orb: "#059669", titleColor: "#15332c",
     buttons: [{
       id: "primeira-venda", title: "Como fazer a sua primeira venda no digital",
       description: "Um caminho direto para sair do zero: escolha do produto, oferta, divulgação e os primeiros passos para conquistar clientes.",
