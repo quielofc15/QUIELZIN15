@@ -5,9 +5,9 @@ const defaults = {
   title: "Seu primeiro passo no digital começa aqui.",
   subtitle: "APRENDA • APLIQUE • EVOLUA",
   description: "Conteúdos práticos para transformar ideias em ação, aprender a vender online e desenvolver habilidades no mercado digital.",
-  bg: "#f8fbf9", panel: "#ffffff", border: "#e2ebe6",
-  button: "#047857", buttonBorder: "#047857", particle: "#10b981",
-  orb: "#059669", titleColor: "#15332c",
+  bg: "#080d13", panel: "#111a23", border: "#233741",
+  button: "#0db983", buttonBorder: "#39e5ad", particle: "#a5f7d0",
+  orb: "#18cc92", titleColor: "#f4fff9",
   buttons: [{
     id: "primeira-venda",
     title: "Como fazer a sua primeira venda no digital",
@@ -18,7 +18,7 @@ const defaults = {
   }]
 };
 const colorKeys = ["bg","panel","border","button","buttonBorder","particle","orb","titleColor"];
-const previousPalette = { bg:"#090b16", panel:"#13172b", border:"#343b5f", button:"#1a2040", buttonBorder:"#7772ed", particle:"#aca8ff", orb:"#7566ff", titleColor:"#f7f8ff" };
+const previousPalettes = [{"bg":"#f8fbf9","panel":"#ffffff","border":"#e2ebe6","button":"#047857","buttonBorder":"#047857","particle":"#10b981","orb":"#059669","titleColor":"#15332c"},{"bg":"#090b16","panel":"#13172b","border":"#343b5f","button":"#1a2040","buttonBorder":"#7772ed","particle":"#aca8ff","orb":"#7566ff","titleColor":"#f7f8ff"}];
 const legacyTitle = "🤍 AMO A LORENA 🤍";
 const text = (value, limit) => typeof value === "string" ? value.trim().slice(0, limit) : "";
 function validUrl(value) {
@@ -34,7 +34,7 @@ function normalize(saved) {
   for (const k of colorKeys) {
     if (typeof source[k] === "string" && /^#[0-9a-fA-F]{6}$/.test(source[k])) out[k] = source[k];
   }
-  if (colorKeys.every(k => out[k] === previousPalette[k])) for (const k of colorKeys) out[k] = defaults[k];
+  for(const key of colorKeys) if(previousPalettes.some(p => out[key] === p[key])) out[key]=defaults[key];
   for (const [key, limit] of [["title",110],["subtitle",90],["description",480]]) {
     const value = text(source[key], limit);
     if (value && value !== legacyTitle) out[key] = value;
