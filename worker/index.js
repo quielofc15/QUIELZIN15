@@ -88,7 +88,12 @@ function equal(a,b) {
   return diff === 0;
 }
 function adminEmail(env) { return (env.ADMIN_EMAIL || "").trim().toLowerCase(); }
-function adminReady(env) { return !!(adminEmail(env) && env.ADMIN_PASSWORD && env.ADMIN_SESSION_SECRET); }
+function missingAdminSecrets(env) {
+  return ["ADMIN_EMAIL","ADMIN_PASSWORD","ADMIN_SESSION_SECRET"].filter((key) =>
+    typeof env[key] !== "string" || !env[key].trim()
+  );
+}
+function adminReady(env) { return missingAdminSecrets(env).length === 0; }
 async function validPassword(input, env) {
   if (typeof input !== "string" || input.length > 256 || !env.ADMIN_PASSWORD) return false;
   // Password remains encrypted as a Cloudflare Secret; comparing hashes avoids branching on character positions.
@@ -176,7 +181,7 @@ export default {
     if (!path.startsWith("/api/")) return env.ASSETS.fetch(request);
     const method = request.method;
     if (path === "/api/admin-config" && method === "GET") {
-      return json({panel:true,provider:"cloudflare",authConfigured:adminReady(env),storageConfigured:!!(env.SITE_CONFIG || (env.SUPABASE_URL && env.SUPABASE_SECRET_KEY))});
+      return json({panel:true,provider:"cloudflare",authConfigured:adminReady(env),missingSecrets:missingAdminSecrets(env),storageConfigured:!!(env.SITE_CONFIG || (env.SUPABASE_URL && env.SUPABASE_SECRET_KEY))});
     }
     if (path === "/api/admin-login") {
       if (method === "DELETE") {
@@ -185,7 +190,7 @@ export default {
       }
       if (method !== "POST") return json({error:"Método não permitido"},405);
       if (!sameOrigin(request)) return json({error:"Origem inválida"},403);
-      if (!adminReady(env)) return json({error:"Configure ADMIN_EMAIL, ADMIN_PASSWORD e ADMIN_SESSION_SECRET nos Secrets do Cloudflare."},503);
+      if (!adminReady(env)) return json({error:"Variáveis ausentes ou indisponíveis neste deploy: " + missingAdminSecrets(env).join(", ") + ". Confira os Secrets e publique a versão atual."},503);
       try {
         const body = await parseBody(request,2048);
         const passwordOk = await validPassword(body?.password,env);
