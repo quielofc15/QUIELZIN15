@@ -65,3 +65,9 @@ Se retornar 404 em /api/admin-config, o build não publicou o Worker ou não usa
 Execute npx wrangler dev na raiz com Node.js instalado.
 Crie .dev.vars apenas na sua máquina, sem versionar.
 O diretório legado api/ contém funções Node.js da antiga hospedagem e NÃO é utilizado no Cloudflare.
+
+## Se o painel ainda pedir os três secrets
+
+O arquivo wrangler.jsonc agora contém keep_vars: true, para preservar variáveis configuradas pelo dashboard em deploys futuros. Verifique exatamente o Worker digital, não uma conta, projeto ou ambiente separado. Em Settings > Variables and Secrets, confira os NOMES: ADMIN_EMAIL, ADMIN_PASSWORD e ADMIN_SESSION_SECRET. Depois clique em Deploy para aplicar os segredos; apenas clicar em Add não basta. Se um deploy anterior removeu os segredos, cadastre-os novamente.
+
+Após publicar, abra /api/admin-config. O campo missingSecrets mostrará somente os NOMES das variáveis ainda não presentes no Worker (nunca os seus valores). authConfigured deve estar true. Se o site continuar com a mensagem antiga, confira a versão ativa em Deployments.
