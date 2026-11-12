@@ -1,10 +1,30 @@
-# Configuração do painel Digital
+# Painel administrativo Digital
 
-A página pública fica em / e o painel administrativo em /admin/.
+Página pública: / • Painel: /admin/.
 
-## 1. Supabase
+## Hospedagem
 
-No SQL Editor do Supabase, execute (se a tabela ainda não existir):
+Este projeto precisa de hospedagem que execute funções Node em api/, como a Vercel. Hospedagens somente estáticas retornam 404 nas rotas /api/admin-login, /api/admin-config e /api/theme. O endpoint /api/admin-config deve retornar JSON.
+
+Se o deploy responder 402 DEPLOYMENT_DISABLED, o projeto foi bloqueado pela hospedagem e nenhuma alteração de código remove essa restrição.
+
+## Credenciais do administrador
+
+O login aceita somente o endereço definido em ADMIN_EMAIL e a senha correspondente ao hash scrypt definido em ADMIN_PASSWORD_HASH. O servidor emite cookie HttpOnly, SameSite=Strict, com assinatura HMAC e validade de oito horas. **Não armazene senhas em arquivos do GitHub.**
+
+Vercel > Project > Settings > Environment Variables:
+
+- ADMIN_EMAIL: e-mail autorizado no painel.
+- ADMIN_PASSWORD_HASH: valor no formato salt_hex:scrypt_hex (salt 16 bytes; scrypt N=16384, r=8, p=1, dklen=64).
+- ADMIN_SESSION_SECRET: segredo randômico com ao menos 32 bytes.
+- SUPABASE_URL: URL do Supabase.
+- SUPABASE_SECRET_KEY: chave de acesso somente servidor do Supabase.
+
+O login não depende mais de um usuário no Supabase Authentication ou de SUPABASE_ANON_KEY. Após mudar qualquer variável, faça novo deploy. Nunca compartilhe a senha nem a chave secreta.
+
+## Tabela para as configurações
+
+Execute no Supabase SQL Editor se a tabela ainda não existir:
 
     create table if not exists public.site_theme (
       id integer primary key check (id = 1),
@@ -14,30 +34,14 @@ No SQL Editor do Supabase, execute (se a tabela ainda não existir):
     alter table public.site_theme enable row level security;
     revoke all on public.site_theme from anon, authenticated;
 
-A API usa a chave de serviço somente no servidor. Os botões e as cores são salvos na coluna JSONB settings. Não é necessária uma nova tabela, mesmo se você já usava o painel antigo.
+A API usa a chave de servidor para ler e atualizar essa tabela; o navegador nunca recebe a chave secreta.
 
-## 2. Usuário administrador
+## Uso
 
-Supabase > Authentication > Users: crie um usuário com e-mail confirmado e senha forte.
+1. Abra /admin/ no domínio hospedado e faça login.
+2. Na seção Botões e conteúdos, edite "Como fazer a sua primeira venda no digital".
+3. Informe a URL real de checkout/acesso. Se ficar vazia, o site exibirá "Link em configuração".
+4. Adicione, oculte, exclua ou reordene com as setas.
+5. Clique em Salvar e publicar.
 
-## 3. Vercel > Settings > Environment Variables
-
-- SUPABASE_URL: URL do seu projeto Supabase.
-- SUPABASE_SECRET_KEY: chave service_role/secret do projeto. **Somente no servidor. Nunca exponha no JavaScript público.**
-- SUPABASE_ANON_KEY: chave pública anon/publishable do projeto, usada apenas no login.
-- ADMIN_EMAIL: e-mail exato do administrador cadastrado e confirmado.
-
-Faça deploy novamente depois de salvar as variáveis.
-
-## 4. Publicar conteúdo
-
-1. Abra /admin/ no domínio publicado e faça login.
-2. Em Botões e conteúdos, edite o primeiro: "Como fazer a sua primeira venda no digital".
-3. Informe a URL verdadeira de checkout ou de acesso. Se ficar vazia, o visitante verá "Link em configuração", sem abrir um destino inventado.
-4. Clique em "+ Adicionar botão" para criar outros conteúdos.
-5. Use ↑ ou ↓ para reordenar. Use "Excluir" para remover. Desmarque "Mostrar este botão" para ocultá-lo.
-6. Personalize o título, descrição e cores; revise a prévia; clique em "Salvar e publicar".
-
-Excluir e reordenar só têm efeito público depois de salvar. A página mantém o conteúdo padrão quando a API está temporariamente indisponível.
-
-Para testar a API localmente, rode vercel dev com as variáveis configuradas. Abrir index.html no navegador não executa as funções /api/.
+Para testar localmente, use vercel dev com as variáveis configuradas. Abrir diretamente o HTML ou publicar somente em GitHub Pages não executa as APIs.

@@ -1,5 +1,6 @@
 // Configuracao publica e administracao do catalogo digital.
 // As credenciais sensiveis ficam apenas no servidor.
+const adminAuth = require("../lib/admin-session");
 const defaults = {
   title: "Seu primeiro passo no digital começa aqui.",
   subtitle: "APRENDA • APLIQUE • EVOLUA",
@@ -96,15 +97,8 @@ module.exports = async (req, res) => {
       const rows = await response.json();
       return res.status(200).json({ theme: normalize(rows[0]?.settings) });
     }
-    const token = (req.headers.authorization || "").match(/^Bearer (.+)$/)?.[1];
-    if (!token) return res.status(401).json({ error: "Entre como administrador." });
-    const auth = await fetch(url + "/auth/v1/user", { headers: { apikey: key, Authorization: "Bearer " + token } });
-    if (!auth.ok) return res.status(401).json({ error: "Sessão expirada ou inválida." });
-    const user = await auth.json();
-    const admin = process.env.ADMIN_EMAIL?.trim().toLowerCase();
-    if (!admin || user.email?.toLowerCase() !== admin || !user.email_confirmed_at) {
-      return res.status(403).json({ error: "Conta sem acesso administrativo." });
-    }
+    if (!adminAuth.sameOrigin(req)) return res.status(403).json({error:"Origem inválida"});
+    if (!adminAuth.isAuthenticated(req)) return res.status(401).json({error:"Faça login no painel para publicar."});
     let settings;
     try { settings = validate(req.body?.theme); }
     catch (error) { return res.status(400).json({ error: error.message }); }

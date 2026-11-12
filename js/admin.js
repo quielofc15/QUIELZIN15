@@ -1,4 +1,4 @@
-/* Painel: autenticacao Supabase, CRUD e ordenacao dos botoes da pagina. */
+/* Painel: sessao protegida pelo servidor, CRUD e ordem dos botoes. */
 (() => {
   "use strict";
   const defaults = {
@@ -31,7 +31,6 @@
   };
   let state = JSON.parse(JSON.stringify(defaults));
   let token = "";
-  let config = null;
   function status(message) { $("saveStatus").textContent = message; }
   function updatePreview() {
     for (const [key, cssVar] of Object.entries(vars)) {
@@ -162,49 +161,42 @@
     if (!response.ok) throw Error(result.error || "Erro HTTP " + response.status);
     return result;
   }
-  async function getConfig() {
-    if (config) return config;
-    config = await readResponse(await fetch("/api/admin-config", {cache:"no-store"}));
-    return config;
-  }
   async function loadSettings() {
     const result = await readResponse(await fetch("/api/theme", {cache:"no-store"}));
     state = { ...JSON.parse(JSON.stringify(defaults)), ...(result.theme || {}) };
     state.buttons = Array.isArray(state.buttons) ? state.buttons.map((b) => ({...b})) : JSON.parse(JSON.stringify(defaults.buttons));
     renderEditor();
   }
+  function setLoggedIn(ok) {
+    token = ok ? "cookie-session" : "";
+    $("editor").hidden = !ok;
+    $("logout").hidden = !ok;
+    $("login").hidden = ok;
+  }
   $("login").addEventListener("click", async () => {
     const button = $("login");
     button.disabled = true;
     $("authStatus").textContent = "Autenticando...";
     try {
-      const cfg = await getConfig();
-      const response = await fetch(cfg.url + "/auth/v1/token?grant_type=password", {
+      await readResponse(await fetch("/api/admin-login", {
         method: "POST",
-        headers: { apikey: cfg.anonKey, "Content-Type": "application/json" },
-        body: JSON.stringify({ email: $("email").value.trim(), password: $("password").value })
-      });
-      const result = await response.json();
-      if (!response.ok || !result.access_token) throw Error("E-mail ou senha incorretos.");
-      const candidate = result.access_token;
-      await readResponse(await fetch("/api/admin-check", {headers: {Authorization: "Bearer " + candidate}}));
-      token = candidate;
+        credentials: "same-origin",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email: $("email").value.trim(),password: $("password").value})
+      }));
       await loadSettings();
-      $("editor").hidden = false;
-      $("logout").hidden = false;
-      $("login").hidden = true;
+      setLoggedIn(true);
       $("password").value = "";
       $("authStatus").textContent = "✓ Administrador autenticado.";
     } catch (error) {
-      token = "";
+      setLoggedIn(false);
       $("authStatus").textContent = error.message;
     } finally { button.disabled = false; }
   });
-  $("logout").addEventListener("click", () => {
-    token = "";
-    $("editor").hidden = true;
-    $("logout").hidden = true;
-    $("login").hidden = false;
+  $("logout").addEventListener("click", async () => {
+    try { await fetch("/api/admin-login", {method:"DELETE",credentials:"same-origin"}); }
+    catch { /* A interface tambem encerra a sessao visual. */ }
+    setLoggedIn(false);
     $("authStatus").textContent = "Sessão encerrada.";
     status("");
   });
@@ -223,7 +215,8 @@
     try {
       const result = await readResponse(await fetch("/api/theme", {
         method: "PUT",
-        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({ theme: state })
       }));
       state = result.theme;
@@ -234,4 +227,13 @@
     } finally { button.disabled = false; }
   });
   updatePreview();
+  // Recupera sessão segura já autenticada ao atualizar a página.
+  (async () => {
+    try {
+      await readResponse(await fetch("/api/admin-check", {credentials:"same-origin",cache:"no-store"}));
+      await loadSettings();
+      setLoggedIn(true);
+      $("authStatus").textContent = "✓ Sessão administrativa restaurada.";
+    } catch { /* Login será necessário. */ }
+  })();
 })();

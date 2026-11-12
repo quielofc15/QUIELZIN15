@@ -1,1 +1,8 @@
-module.exports=async(req,res)=>{res.setHeader("Cache-Control","no-store");const url=process.env.SUPABASE_URL?.replace(/\/$/,""),key=process.env.SUPABASE_SECRET_KEY,admin=process.env.ADMIN_EMAIL?.trim().toLowerCase(),token=(req.headers.authorization||"").match(/^Bearer (.+)$/)?.[1];if(!url||!key||!admin)return res.status(503).json({error:"Configuração ausente"});if(!token)return res.status(401).json({error:"Não autenticado"});try{const r=await fetch(url+"/auth/v1/user",{headers:{apikey:key,Authorization:"Bearer "+token}});if(!r.ok)return res.status(401).json({error:"Sessão inválida"});const user=await r.json();if(user.email?.toLowerCase()!==admin||!user.email_confirmed_at)return res.status(403).json({error:"Não autorizado"});return res.json({ok:true})}catch{return res.status(500).json({error:"Falha na autenticação"})}};
+const auth = require("../lib/admin-session");
+module.exports = async (req,res) => {
+  res.setHeader("Cache-Control","no-store");
+  if (req.method !== "GET") return res.status(405).json({error:"Método não permitido"});
+  if (!auth.configured()) return res.status(503).json({error:"Autenticação não configurada"});
+  if (!auth.isAuthenticated(req)) return res.status(401).json({error:"Sessão expirada. Faça login novamente."});
+  return res.status(200).json({ok:true});
+};
