@@ -63,10 +63,12 @@
       } else {
         cta.setAttribute("aria-label", "Link ainda não configurado para " + item.title);
       }
-      cta.append(document.createTextNode(href ? "Acessar conteúdo" : "Link em configuração"));
-      const arrow = make("span", "", "↗");
+      const ctaText = make("span", "course-action-text");
+      ctaText.append(make("span", "course-action-title", href ? "Acessar conteúdo" : "Link em configuração"));
+      ctaText.append(make("span", "course-action-subtitle", href ? "Abrir conteúdo digital" : "Disponível em breve"));
+      const arrow = make("span", "course-action-icon", href ? "↗" : "⌁");
       arrow.setAttribute("aria-hidden", "true");
-      cta.append(arrow);
+      cta.append(ctaText, arrow);
       card.append(cta);
       list.append(card);
     }
