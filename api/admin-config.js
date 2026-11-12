@@ -1,1 +1,7 @@
-module.exports=(req,res)=>{if(req.method!=="GET")return res.status(405).end();const url=process.env.SUPABASE_URL,anonKey=process.env.SUPABASE_ANON_KEY;if(!url||!anonKey)return res.status(503).json({error:"Configuração ausente"});res.setHeader("Cache-Control","no-store");return res.json({url:url.replace(/\/$/,""),anonKey});};
+// Mantida para diagnostico; nao entrega chaves ou configuracao sensivel.
+const auth = require("../lib/admin-session");
+module.exports = (req,res) => {
+  res.setHeader("Cache-Control","no-store");
+  if (req.method !== "GET") return res.status(405).json({error:"Método não permitido"});
+  return res.status(200).json({panel:true,authConfigured:auth.configured(),storageConfigured:Boolean(process.env.SUPABASE_URL&&process.env.SUPABASE_SECRET_KEY)});
+};
